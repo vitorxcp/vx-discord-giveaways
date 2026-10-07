@@ -1,4 +1,4 @@
-declare module 'discord-giveaways' {
+declare module 'vx-discord-giveaways' {
     import { EventEmitter } from 'events';
     import {
         Client,
@@ -10,10 +10,42 @@ declare module 'discord-giveaways' {
         GuildMember,
         TextChannel,
         MessageReaction,
-        Message
+        Message,
+        MessageEmbed,
+        EmbedBuilder
     } from 'discord.js';
 
     export const version: string;
+    export const discordjsVersion: 11 | 12 | 13 | 14;
+
+    export const DiscordUtil: {
+        Discord: typeof Client;
+        version: string;
+        major: 11 | 12 | 13 | 14;
+        createEmbed(): MessageEmbed | EmbedBuilder;
+        setEmbedFooter(embed: MessageEmbed | EmbedBuilder, text: string): MessageEmbed | EmbedBuilder;
+        setEmbedAuthor(embed: MessageEmbed | EmbedBuilder, name: string, iconURL?: string, url?: string): MessageEmbed | EmbedBuilder;
+        sendMessage(channel: TextChannel, content: string, embeds: Array<MessageEmbed | EmbedBuilder>): Promise<Message>;
+        editMessage(message: Message, content: string, embeds: Array<MessageEmbed | EmbedBuilder>): Promise<Message>;
+        fetchReactionUsers(reaction: MessageReaction, options?: { limit?: number; after?: string }): Promise<Map<string, User>>;
+        fetchAllReactionUsers(reaction: MessageReaction): Promise<Map<string, User>>;
+        getMessageReactions(message: Message): Map<string, MessageReaction>;
+        parseEmoji(emoji: EmojiIdentifierResolvable | string): { name: string | null; id: string | null };
+        reactionMatches(reaction: MessageReaction, emoji: string): boolean;
+        findReaction(message: Message, emoji: string): MessageReaction | null;
+        getClientGuild(client: Client, guildID: string): any | null;
+        getClientChannel(client: Client, channelID: string): any | null;
+        getGuildChannel(guild: any, channelID: string): any | null;
+        getCachedMessage(channel: TextChannel, messageID: string): Message | null;
+        fetchMessage(channel: TextChannel, messageID: string): Promise<Message | null>;
+        getCachedMember(guild: any, memberID: string): GuildMember | null;
+        fetchMember(guild: any, memberID: string): Promise<GuildMember | null>;
+        fetchAllMembers(guild: any): Promise<any>;
+        memberHasPermission(member: GuildMember, permission: PermissionResolvable): boolean;
+        getMemberRoles(member: GuildMember): any;
+        getReactionUsers(reaction: MessageReaction): Map<string, User>;
+    };
+
     export class GiveawaysManager extends EventEmitter {
         constructor(client: Client, options?: GiveawaysManagerOptions);
 
@@ -22,9 +54,10 @@ declare module 'discord-giveaways' {
         public options: GiveawaysManagerOptions;
         public ready: boolean;
 
+        public get(messageID: Snowflake): Giveaway | null;
         public delete(messageID: Snowflake, doNotDeleteMessage?: boolean): Promise<void>;
         // @ts-ignore-next-line
-        public async deleteGiveaway(messageID: Snowflake): Promise<void>;
+        public async deleteGiveaway(messageID: Snowflake): Promise<boolean>;
         public edit(messageID: Snowflake, options: GiveawayEditOptions): Promise<Giveaway>;
         public end(messageID: Snowflake): Promise<GuildMember[]>;
         public reroll(messageID: Snowflake, options?: GiveawayRerollOptions): Promise<GuildMember[]>;
@@ -74,6 +107,7 @@ declare module 'discord-giveaways' {
         messages?: Partial<GiveawaysMessages>;
         extraData?: any;
         lastChance?: LastChanceOptions;
+        fetchAllParticipants?: boolean;
     }
     interface GiveawaysMessages {
         giveaway?: string;
@@ -128,10 +162,12 @@ declare module 'discord-giveaways' {
         readonly embedColorEnd: ColorResolvable;
         readonly botsCanWin: boolean;
         readonly reaction: string;
+        readonly fetchAllParticipants: boolean;
 
         // getters calculated using other values
         readonly remainingTime: number;
         readonly messageURL: string;
+        readonly isActive: boolean;
         readonly content: string;
         readonly channel: TextChannel;
         readonly exemptMembersFunction: Function | null;
@@ -141,7 +177,7 @@ declare module 'discord-giveaways' {
         public edit(options: GiveawayEditOptions): Promise<Giveaway>;
         public end(): Promise<GuildMember[]>;
         // @ts-ignore-next-line
-        public async fetchMessage(): Promise<Message>;
+        public async fetchMessage(): Promise<Message | null>;
         public reroll(options: GiveawayRerollOptions): Promise<GuildMember[]>;
         // @ts-ignore-next-line
         public async roll(winnerCount?: number): Promise<GuildMember[]>;
@@ -182,5 +218,6 @@ declare module 'discord-giveaways' {
         hostedBy?: string | null;
         extraData?: any;
         lastChance?: LastChanceOptions;
+        fetchAllParticipants?: boolean;
     }
 }

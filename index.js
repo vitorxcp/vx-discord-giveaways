@@ -1,4 +1,9 @@
+const { version } = require('./package.json');
+const DiscordUtil = require('./src/DiscordUtil.js');
+
 module.exports = {
-    version: require('./package.json').version,
-    GiveawaysManager: require('./src/Manager')
+    version,
+    discordjsVersion: DiscordUtil.major,
+    GiveawaysManager: require('./src/Manager'),
+    DiscordUtil
 };

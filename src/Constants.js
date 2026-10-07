@@ -9,7 +9,7 @@ const Discord = require('discord.js');
  * @property {string} [inviteToParticipate='React with 🎉 to participate!'] Displayed in the giveaway embed. Incite people to react to the giveaway.
  * @property {string} [timeRemaining='Time remaining: **{duration}**'] Displayed below inviteToParticipate in the giveaway embed. {duration} will be replaced automatically with the time remaining.
  * @property {string} [winMessage='Congratulations, {winners}! You won **{prize}**!\n{messageURL}'] Sent in the channel when the giveaway is ended.
- * @property {string} [embedFooter='Powered by the discord-giveaways package'] The footer of the giveaway embed.
+ * @property {string} [embedFooter='Mensagem por vx-discord-giveaways!'] The footer of the giveaway embed.
  * @property {string} [noWinner='Giveaway cancelled, no valid participations.'] Sent in the channel if there's no valid winner for the giveaway.
  * @property {string} [winners='winner(s)'] Displayed next to the embed footer, used to display the number of winners of the giveaways.
  * @property {string} [endedAt='Ended at'] Displayed next to the embed footer, used to display the giveaway end date.
@@ -41,6 +41,7 @@ exports.GiveawayMessages = {};
  * @property {GiveawayMessages} [messages] The giveaway messages
  * @property {any} [extraData] The extra data value for this giveaway
  * @property {LastChanceOptions} [lastChance] The last chance system options
+ * @property {boolean} [fetchAllParticipants=false] Whether to fetch all the participants (paginated), instead of only the latest 100
  */
 exports.GiveawayStartOptions = {};
 
@@ -50,20 +51,20 @@ exports.GiveawayStartOptions = {};
  */
 exports.defaultGiveawayMessages = {
     giveaway: '@everyone\n\n🎉🎉 **GIVEAWAY** 🎉🎉',
-    giveawayEnded: '@everyone\n\n🎉🎉 **GIVEAWAY ENDED** 🎉🎉',
-    inviteToParticipate: 'React with 🎉 to participate!',
-    timeRemaining: 'Time remaining: **{duration}**',
-    winMessage: 'Congratulations, {winners}! You won **{prize}**!\n{messageURL}',
-    embedFooter: 'Powered by the discord-giveaways package',
-    noWinner: 'Giveaway cancelled, no valid participations.',
-    winners: 'winner(s)',
-    endedAt: 'Ended at',
-    hostedBy: 'Hosted by: {user}',
+    giveawayEnded: '@everyone\n\n🎉🎉 **GIVEAWAY FINALIZADO** 🎉🎉',
+    inviteToParticipate: 'Clique em 🎉 para participar do sorteio!',
+    timeRemaining: 'O sorteio termina em: **{duration}**',
+    winMessage: 'Parabéns, {winners}! Você ganhou **{prize}**!\n{messageURL}',
+    embedFooter: 'Mensagem por vx-discord-giveaways!',
+    noWinner: 'Sorteio cancelado, nenhuma pessoa entrou.',
+    winners: 'Ganhador(es)',
+    endedAt: 'Terminou em',
+    hostedBy: 'Sorteio por: {user}',
     units: {
-        seconds: 'seconds',
-        minutes: 'minutes',
-        hours: 'hours',
-        days: 'days',
+        seconds: 'segundos',
+        minutes: 'minutos',
+        hours: 'horas',
+        days: 'dias',
         pluralS: false
     }
 };
@@ -88,7 +89,7 @@ exports.BonusEntry = {};
  */
 exports.LastChanceOptions = {
     enabled: false,
-    content: '⚠️ **LAST CHANCE TO ENTER !** ⚠️',
+    content: '⚠️ **ÚLTIMA CHANCE PARA ENTRAR!** ⚠️',
     threshold: 5000,
     embedColor: '#FF0000'
 };
@@ -109,6 +110,7 @@ exports.LastChanceOptions = {
  * @property {Discord.ColorResolvable} [default.embedColorEnd='#000000'] The giveaways embed color when they are ended
  * @property {Discord.EmojiIdentifierResolvable} [default.reaction='🎉'] The reaction to participate in the giveaways
  * @property {LastChanceOptions} [default.lastChance] The last chance system parameters
+ * @property {boolean} [default.fetchAllParticipants=false] Whether to fetch all the participants (paginated), instead of only the latest 100
  */
 exports.GiveawaysManagerOptions = {};
 
@@ -120,7 +122,7 @@ exports.defaultManagerOptions = {
     storage: './giveaways.json',
     updateCountdownEvery: 5000,
     endedGiveawaysLifetime: null,
-    hasGuildMemberIntent: false,
+    hasGuildMembersIntent: false,
     default: {
         botsCanWin: false,
         exemptPermissions: [],
@@ -130,10 +132,11 @@ exports.defaultManagerOptions = {
         reaction: '🎉',
         lastChance: {
             enabled: false,
-            content: '⚠️ **LAST CHANCE TO ENTER !** ⚠️',
-            secondsBeforeLastChance: 5000,
+            content: '⚠️ **ÚLTIMA CHANCE PARA ENTRAR!** ⚠️',
+            threshold: 5000,
             embedColor: '#FF0000'
-        }
+        },
+        fetchAllParticipants: false
     }
 };
 
@@ -155,8 +158,8 @@ exports.GiveawayRerollOptions = {};
 exports.defaultRerollOptions = {
     winnerCount: null,
     messages: {
-        congrat: ':tada: New winner(s): {winners}! Congratulations, you won **{prize}**!\n{messageURL}',
-        error: 'No valid participations, no new winner(s) can be chosen!'
+        congrat: ':tada: Novo(s) vencedor(es): {winners}! Parabéns você venceu **{prize}**!\n{messageURL}',
+        error: 'Nenhuma participação válida, nenhum novo vencedor(es) pode ser escolhido!'
     }
 };
 
